@@ -9,10 +9,12 @@ struct node {
 };
 
 struct node* new_node(int data);
+void destroy_tree(struct node* tree);
 void insert_node(struct node* root, struct node* node);
 int search(struct node* tree, int data);
 
 int main() {
+	int n = 0, level = 0;
 	struct node* tree = new_node(6);
 	insert_node(tree, new_node(5));
 	insert_node(tree, new_node(11));
@@ -23,6 +25,14 @@ int main() {
 	insert_node(tree, new_node(9));
 	insert_node(tree, new_node(21));
 	
+	printf("Ingresa el numero a buscar en el arbol: ");
+	scanf("%d", &n);
+	level = search(tree, n);
+	if (level > 0)
+		printf("El numero esta en el nivel: %d\n", level);
+	else 
+		printf("Numero no encontrado\n");
+
 	return 0;
 }
 
@@ -37,12 +47,21 @@ struct node* new_node(int data) {
 	return node;
 }
 
-void insert_node(struct node* root, node* node) {
-	if (node->data > root->data)
-		root->right = node;
-	else
-		root->left = node;
-	node->level = root->level + 1;
+void insert_node(struct node* root, struct node* node) {
+	if (root != NULL && node != NULL) {
+		node->level = root->level + 1;
+		if (node->data > root->data) {
+			if (root->right == NULL)
+				root->right = node;
+			else
+				insert_node(root->right, node);
+		} else {
+			if (root->left == NULL)
+				root->left = node;
+			else
+				insert_node(root->left, node);
+		}
+	}
 }
 
 int search(struct node* tree, int data) {
@@ -51,10 +70,10 @@ int search(struct node* tree, int data) {
 		return 0;
 	if (tree->data == data)
 		return tree->level;
-	l = search(tree->left);
+	l = search(tree->left, data);
 	if (l > 0)
 		return l;
-	l = search(tree->right);
+	l = search(tree->right, data);
 	if (l > 0)
 		return l;
 	return 0;
